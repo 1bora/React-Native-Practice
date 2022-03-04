@@ -2,9 +2,20 @@ import * as Location from 'expo-location'
 import React, { useEffect, useState } from 'react'
 import { View, Text, Dimensions, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import { DailyWeatherAPIResponse, IDailyWeather } from './types'
+import { Fontisto } from '@expo/vector-icons'
+import iconSet from '@expo/vector-icons/build/Fontisto'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 const API_KEY = 'e13bf2bcb4784f2d03d9cd498f70a60b'
+const icons: { [key: string]: 'day-sunny' | 'cloudy' | 'rain' | 'cloudy-gusts' | 'snow' | 'day-rain' | 'lightning' } = {
+  Clear: 'day-sunny',
+  Clouds: 'cloudy',
+  Rain: 'rain',
+  Atmosphere: 'cloudy-gusts',
+  Snow: 'snow',
+  Drizzle: 'day-rain',
+  Thunderstorm: 'lightning',
+}
 
 export default function App() {
   const [city, setCity] = useState('-')
@@ -25,7 +36,6 @@ export default function App() {
     )
     const { daily }: DailyWeatherAPIResponse = await response.json()
     setDays(daily)
-    console.log(response)
   }
 
   useEffect(() => {
@@ -50,20 +60,28 @@ export default function App() {
         ) : (
           days.map((day, index) => (
             <View style={styles.day} key={index}>
-              <Text style={styles.temp}>{Math.floor(day.temp.day)}°</Text>
+              <View>
+                <Text style={styles.temp}>{Math.floor(day.temp.day)}°</Text>
+                <Fontisto name={icons[day.weather[0].main]} size={21} color="white" />
+              </View>
               <Text style={styles.description}>{day.weather[0].main}</Text>
               <Text>{day.weather[0].description}</Text>
             </View>
           ))
         )}
       </ScrollView>
+      <View style={styles.navigationContainer}>
+        {days.map((day, i) => (
+          <View style={styles.dot} key={`dot-${i}`}></View>
+        ))}
+      </View>
     </View>
   )
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a9494',
+    backgroundColor: '#6a60c2',
   },
   city: {
     flex: 1.2,
@@ -85,4 +103,16 @@ const styles = StyleSheet.create({
     fontSize: 150,
   },
   description: { marginTop: -30, fontSize: 60 },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 10,
+    backgroundColor: 'white',
+  },
+  navigationContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 })
